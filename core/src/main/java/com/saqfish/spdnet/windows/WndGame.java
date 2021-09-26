@@ -21,12 +21,15 @@
 
 package com.saqfish.spdnet.windows;
 
+import static com.saqfish.spdnet.ShatteredPixelDungeon.net;
+
 import com.saqfish.spdnet.Dungeon;
 import com.saqfish.spdnet.GamesInProgress;
 import com.saqfish.spdnet.ShatteredPixelDungeon;
 import com.saqfish.spdnet.messages.Messages;
 import com.saqfish.spdnet.net.events.Send;
 import com.saqfish.spdnet.net.ui.BlueButton;
+import com.saqfish.spdnet.net.windows.NetWindow;
 import com.saqfish.spdnet.scenes.GameScene;
 import com.saqfish.spdnet.scenes.HeroSelectScene;
 import com.saqfish.spdnet.scenes.InterlevelScene;
@@ -122,10 +125,25 @@ public class WndGame extends Window {
 					ShatteredPixelDungeon.reportException(e);
 				}
 				Game.switchScene(TitleScene.class);
-				ShatteredPixelDungeon.net().sender().sendAction(Send.INTERLEVEL, 0, 0, 0);
+				net().sender().sendAction(Send.INTERLEVEL, 0, 0, 0);
 			}
 		} );
 		curBtn.icon(Icons.get(Icons.DISPLAY));
+
+
+		// Func
+		addButton(new RedButton( "Log" ) {
+			@Override
+			protected void onClick() {
+				NetWindow.showLogList();
+			}
+
+			@Override
+			protected boolean onLongClick() {
+				net().logger().snapshot();
+				return true;
+			}
+		} );
 
 		resize( WIDTH, pos );
 	}

@@ -69,6 +69,10 @@ public class NetWindow extends Window {
         Game.runOnRenderThread(() -> ShatteredPixelDungeon.scene().add(new WndNetSettings()));
     }
 
+    public static void showLogList(){
+        Game.runOnRenderThread(() -> ShatteredPixelDungeon.scene().add(new WndLogList()));
+    }
+
     public static void showChat(){
         Game.runOnRenderThread(() -> ShatteredPixelDungeon.scene().add(new WndChat()));
     }

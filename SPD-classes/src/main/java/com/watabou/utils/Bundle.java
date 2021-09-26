@@ -59,6 +59,8 @@ public class Bundle {
 	public String toString() {
 		return data.toString();
 	}
+
+	public JSONObject getData() { return data; }
 	
 	private Bundle( JSONObject data ) {
 		this.data = data;

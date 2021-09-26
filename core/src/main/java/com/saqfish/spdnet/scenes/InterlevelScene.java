@@ -70,7 +70,7 @@ public class InterlevelScene extends PixelScene {
 	private static float fadeTime;
 	
 	public enum Mode {
-		DESCEND, ASCEND, CONTINUE, RESURRECT, RETURN, FALL, RESET, NONE
+		DESCEND, ASCEND, CONTINUE, RESURRECT, RETURN, FALL, RESET, LOG, NONE
 	}
 	public static Mode mode;
 	
@@ -143,6 +143,11 @@ public class InterlevelScene extends PixelScene {
 			case RETURN:
 				loadingDepth = returnDepth;
 				scrollSpeed = returnDepth > Dungeon.depth ? 15 : -15;
+				break;
+			case LOG:
+				loadingDepth = returnDepth;
+				fadeTime = 0f;
+				scrollSpeed = 50;
 				break;
 		}
 
@@ -273,6 +278,9 @@ public class InterlevelScene extends PixelScene {
 								break;
 							case RESET:
 								reset();
+								break;
+							case LOG:
+								log();
 								break;
 						}
 						
@@ -425,6 +433,12 @@ public class InterlevelScene extends PixelScene {
 		Dungeon.depth = returnDepth;
 		Level level = Dungeon.loadLevel( GamesInProgress.curSlot );
 		Dungeon.switchLevel( level, returnPos );
+		ShatteredPixelDungeon.net().sender().sendAction(Send.INTERLEVEL, Dungeon.hero.heroClass.ordinal(), Dungeon.depth, returnPos);
+	}
+
+	private void log() {
+		Dungeon.depth = returnDepth;
+		Dungeon.switchLevel( Dungeon.level, returnPos );
 		ShatteredPixelDungeon.net().sender().sendAction(Send.INTERLEVEL, Dungeon.hero.heroClass.ordinal(), Dungeon.depth, returnPos);
 	}
 	

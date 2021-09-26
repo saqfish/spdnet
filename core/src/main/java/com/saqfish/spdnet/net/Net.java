@@ -23,6 +23,7 @@ import com.saqfish.spdnet.Dungeon;
 import com.saqfish.spdnet.ShatteredPixelDungeon;
 import com.saqfish.spdnet.net.events.Events;
 import com.saqfish.spdnet.net.events.Send;
+import com.saqfish.spdnet.net.log.Logger;
 import com.saqfish.spdnet.net.windows.NetWindow;
 import com.saqfish.spdnet.net.windows.WndServerInfo;
 import com.saqfish.spdnet.scenes.GameScene;
@@ -52,6 +53,7 @@ public class Net {
     private Sender sender;
     private ObjectMapper mapper;
     private Loader loader;
+    private Logger logger;
     private long seed;
 
     private NetWindow w;
@@ -89,6 +91,7 @@ public class Net {
         socket = IO.socket(url, options);
         mapper = new ObjectMapper();
         loader = new Loader();
+        logger = new Logger();
         receiver = new Receiver(this, mapper);
         sender = new Sender(this, mapper);
         setupEvents();
@@ -163,6 +166,8 @@ public class Net {
         }
         receiver = null;
         sender = null;
+        loader = null;
+        logger = null;
     }
 
 
@@ -175,5 +180,6 @@ public class Net {
     public Sender sender() { return sender; }
     public Receiver reciever() { return receiver; }
     public Loader loader() { return loader; }
+    public Logger logger() { return logger; }
     public URI uri(){ return Settings.uri(); }
 }

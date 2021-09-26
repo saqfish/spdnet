@@ -1478,6 +1478,8 @@ public class Hero extends Char {
 
 		}
 
+		net().logger().snapshot();
+
 		return true;
 	}
 
