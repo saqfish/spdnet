@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon;
 
+import com.shatteredpixel.shatteredpixeldungeon.net.Net;
+import com.shatteredpixel.shatteredpixeldungeon.net.Settings;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.TitleScene;
@@ -42,7 +44,9 @@ public class ShatteredPixelDungeon extends Game {
 	public static final int v2_5_4 = 802;
 
 	public static final int v3_0_0 = 831;
-	
+
+	public static Net net;
+
 	public ShatteredPixelDungeon( PlatformSupport platform ) {
 		super( sceneClass == null ? WelcomeScene.class : sceneClass, platform );
 
@@ -91,7 +95,7 @@ public class ShatteredPixelDungeon extends Game {
 				com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.exit.ExitRoom.class,
 				"com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.ExitRoom" );
 	}
-	
+
 	@Override
 	public void create() {
 		super.create();
@@ -105,11 +109,20 @@ public class ShatteredPixelDungeon extends Game {
 		Sample.INSTANCE.volume( SPDSettings.SFXVol()*SPDSettings.SFXVol()/100f );
 
 		Sample.INSTANCE.load( Assets.Sounds.all );
-		
+
+		net = DeviceCompat.isDesktop() && DeviceCompat.isDebug() ?
+				new Net("http://127.0.0.1:5800"):
+				new Net(Settings.defaultStringUri(), Settings.auth_key());
+
+	}
+
+	public static Net net() {
+		return net;
 	}
 
 	@Override
 	public void finish() {
+		net.finish();
 		if (!DeviceCompat.isiOS()) {
 			super.finish();
 		} else {

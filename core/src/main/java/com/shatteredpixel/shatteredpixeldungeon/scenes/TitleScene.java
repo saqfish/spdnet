@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
@@ -32,6 +33,10 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.BannerSprites;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Fireball;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.net.events.Events;
+import com.shatteredpixel.shatteredpixeldungeon.net.events.Receive;
+import com.shatteredpixel.shatteredpixeldungeon.net.ui.NetIcons;
+import com.shatteredpixel.shatteredpixeldungeon.net.windows.NetWindow;
 import com.shatteredpixel.shatteredpixeldungeon.services.news.News;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.AvailableUpdateData;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.Updates;
@@ -54,6 +59,8 @@ import com.watabou.utils.ColorMath;
 import com.watabou.utils.DeviceCompat;
 
 import java.util.Date;
+
+import static com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon.net;
 
 public class TitleScene extends PixelScene {
 	
@@ -142,8 +149,43 @@ public class TitleScene extends PixelScene {
 		btnPlay.icon(Icons.get(Icons.ENTER));
 		add(btnPlay);
 
-		StyledButton btnSupport = new SupportButton(GREY_TR, Messages.get(this, "support"));
-		add(btnSupport);
+
+		StyledButton btnConnection = new StyledButton(GREY_TR, "SPDNet"){
+			@Override
+			protected void onClick() {
+				NetWindow.showServerInfo();
+			}
+		};
+
+		btnConnection.icon(NetIcons.get(NetIcons.GLOBE));
+		btnConnection.icon().scale.set(PixelScene.align(0.8f));
+		add(btnConnection);
+
+		StyledButton btnPlayers = new StyledButton(GREY_TR, "Players"){
+			@Override
+			protected void onClick() {
+				if (net().connected()) {
+					net().sender().sendPlayerListRequest();
+				}else{
+					NetWindow.error("Not Connected", "You must connect before viewing players");
+					return;
+				}
+				net().socket().once(Events.PLAYERLISTREQUEST, args -> {
+					String data = (String) args[0];
+					DeviceCompat.log("PLAYERLIST", data);
+					try {
+						final Receive.PlayerList pl = net().mapper().readValue(data, Receive.PlayerList.class);
+						Game.runOnRenderThread(() -> NetWindow.showPlayerList(pl));
+					} catch (JsonProcessingException e) {
+						e.printStackTrace();
+					}
+				});
+			}
+		};
+
+		btnPlayers.icon(NetIcons.get(NetIcons.PLAYERS));
+		btnPlayers.icon().scale.set(PixelScene.align(0.8f));
+		add(btnPlayers);
 
 		StyledButton btnRankings = new StyledButton(GREY_TR,Messages.get(this, "rankings")){
 			@Override
@@ -194,7 +236,8 @@ public class TitleScene extends PixelScene {
 		if (landscape()) {
 			btnPlay.setRect(btnAreaLeft, topRegion+GAP, (buttonAreaWidth/2)-1, BTN_HEIGHT);
 			align(btnPlay);
-			btnSupport.setRect(btnPlay.right()+2, btnPlay.top(), btnPlay.width(), BTN_HEIGHT);
+			btnConnection.setRect(btnPlay.right()+2, btnPlay.top(), (btnPlay.width()/2), BTN_HEIGHT);
+			btnPlayers.setRect(btnConnection.right()+2, btnPlay.top(), (btnPlay.width()/2), BTN_HEIGHT);
 			btnRankings.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, (float) (Math.floor(buttonAreaWidth/3f)-1), BTN_HEIGHT);
 			btnBadges.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
 			btnNews.setRect(btnBadges.right()+2, btnBadges.top(), btnRankings.width(), BTN_HEIGHT);
@@ -204,8 +247,9 @@ public class TitleScene extends PixelScene {
 		} else {
 			btnPlay.setRect(btnAreaLeft, topRegion+GAP, buttonAreaWidth, BTN_HEIGHT);
 			align(btnPlay);
-			btnSupport.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, btnPlay.width(), BTN_HEIGHT);
-			btnRankings.setRect(btnPlay.left(), btnSupport.bottom()+ GAP, (btnPlay.width()/2)-1, BTN_HEIGHT);
+			btnConnection.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, (btnPlay.width()/2), BTN_HEIGHT);
+			btnPlayers.setRect(btnConnection.right(), btnPlay.bottom()+ GAP, (btnPlay.width()/2), BTN_HEIGHT);
+			btnRankings.setRect(btnPlay.left(), btnConnection.bottom()+ GAP, (btnPlay.width()/2)-1, BTN_HEIGHT);
 			btnBadges.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
 			btnNews.setRect(btnRankings.left(), btnRankings.bottom()+ GAP, btnRankings.width(), BTN_HEIGHT);
 			btnChanges.setRect(btnNews.right()+2, btnNews.top(), btnNews.width(), BTN_HEIGHT);

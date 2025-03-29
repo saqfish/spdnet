@@ -22,9 +22,11 @@
 package com.watabou.gltextures;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.watabou.glwrap.Texture;
 import com.watabou.noosa.Game;
+import com.watabou.utils.FileUtils;
 
 import java.util.HashMap;
 
@@ -152,9 +154,12 @@ public class TextureCache {
 				return null;
 				
 			} else if (src instanceof String) {
-				
-				return new Pixmap(Gdx.files.internal((String)src));
-				
+
+				FileHandle file = Gdx.files.external( FileUtils.getDefaultPath()+src);
+				if(file.exists() && !file.isDirectory()){
+					return new Pixmap(Gdx.files.external(FileUtils.getDefaultPath()+src));
+				} else return new Pixmap(Gdx.files.internal((String)src));
+
 			} else if (src instanceof Pixmap) {
 				
 				return (Pixmap)src;

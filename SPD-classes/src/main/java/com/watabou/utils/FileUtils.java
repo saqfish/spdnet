@@ -43,7 +43,9 @@ public class FileUtils {
 		defaultFileType = type;
 		defaultPath = path;
 	}
-	
+
+	public static String getDefaultPath( ){ return defaultPath;	}
+
 	public static FileHandle getFileHandle( String name ){
 		return getFileHandle( defaultFileType, defaultPath, name );
 	}

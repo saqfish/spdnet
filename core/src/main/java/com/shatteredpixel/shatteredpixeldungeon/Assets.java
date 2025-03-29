@@ -77,6 +77,8 @@ public class Assets {
 
 		public static final String CHROME   = "interfaces/chrome.png";
 		public static final String ICONS    = "interfaces/icons.png";
+		public static final String NETICONS	= "interfaces/neticons.png";
+		public static final String NETUI	= "interfaces/netui.png";
 		public static final String STATUS   = "interfaces/status_pane.png";
 		public static final String MENU     = "interfaces/menu_pane.png";
 		public static final String MENU_BTN = "interfaces/menu_button.png";
